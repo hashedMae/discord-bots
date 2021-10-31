@@ -2,7 +2,7 @@ import { GuildMember } from 'discord.js';
 import { DiscordEvent } from '../types/discord/DiscordEvent';
 import ServiceUtils from '../utils/ServiceUtils';
 import { LogUtils } from '../utils/Log';
-import SpamFilter from '../service/spam-filter/SpamFilter';
+import UsernameSpamFilter from '../service/spam-filter/UsernameSpamFilter';
 
 export default class implements DiscordEvent {
 	name = 'guildMemberAdd';
@@ -11,7 +11,7 @@ export default class implements DiscordEvent {
 	async execute(member: GuildMember): Promise<any> {
 		try {
 			if (ServiceUtils.isBanklessDAO(member.guild)) {
-				if (await SpamFilter.runUsernameSpamFilter(member)) {
+				if (await UsernameSpamFilter.runUsernameSpamFilter(member)) {
 					return;
 				}
 			}

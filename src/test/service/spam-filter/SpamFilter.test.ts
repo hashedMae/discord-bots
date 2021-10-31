@@ -2,7 +2,7 @@ import { Collection } from '@discordjs/collection';
 import { Builder } from 'builder-pattern';
 import { Guild, GuildMember, GuildMemberRoleManager, Role } from 'discord.js';
 import roleIDs from '../../../app/service/constants/roleIds';
-import SpamFilter from '../../../app/service/spam-filter/SpamFilter';
+import UsernameSpamFilter from '../../../app/service/spam-filter/UsernameSpamFilter';
 import Log from '../../../app/utils/Log';
 
 jest.mock('../../../app/utils/Log');
@@ -27,16 +27,16 @@ describe('Username spam filter', () => {
 
 	const defaultGuildMember: GuildMember = {
 		nickname: null,
-		displayName: 'Pioneer',
+		displayName: '0xLucas',
 		bannable: true,
 		guild: guild,
 		roles: {
 			cache: new Collection(),
 		},
 		user: {
-			id: '930362313029460717',
-			username: 'Pioneer',
-			tag: 'Pioneer#1559',
+			id: '830462333029460010',
+			username: '0xLucas',
+			tag: '0xLucas#1559',
 		},
 		ban: jest.fn(() => Promise.resolve()),
 		send: jest.fn(() => Promise.resolve()),
@@ -93,20 +93,10 @@ describe('Username spam filter', () => {
 	});
 		
 	beforeEach(() => {
-		jest.spyOn(SpamFilter, 'onAllowlist').mockReturnValue(Promise.resolve(false));
-	});
-
-	it('should skip filter for member that is at least level 1', async () => {
-		const guildMember = Builder(defaultGuildMember)
-			.roles(Builder<GuildMemberRoleManager>()
-				.cache(new Collection([[roleIDs.genesisSquad, Builder(Role).id(roleIDs.genesisSquad).build()]]))
-				.build())
-			.build();
-
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
-		expect(guildMember.guild.fetch).toHaveBeenCalledTimes(0);
-		expect(guildMember.ban).toHaveBeenCalledTimes(0);
-		expect(guildMember.send).toHaveBeenCalledTimes(0);
+		jest.spyOn(UsernameSpamFilter, 'memberOnAllowlist').mockReturnValue(Promise.resolve(false));
+		jest.spyOn(UsernameSpamFilter, 'roleOnAllowlist').mockReturnValue(Promise.resolve(false));
+		jest.spyOn(UsernameSpamFilter, 'getHighRankingRolesForServer')
+			.mockReturnValue(Promise.resolve([roleIDs.genesisSquad, roleIDs.admin, roleIDs.level2]));
 	});
 
 	it('should skip filter for member this is not bannable', async () => {
@@ -114,7 +104,7 @@ describe('Username spam filter', () => {
 			.bannable(false)
 			.build();
 
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
 		expect(guildMember.guild.fetch).toHaveBeenCalledTimes(0);
 		expect(guildMember.ban).toHaveBeenCalledTimes(0);
 		expect(guildMember.send).toHaveBeenCalledTimes(0);
@@ -122,28 +112,50 @@ describe('Username spam filter', () => {
 
 	it('should skip filter for member that is on allowlist', async () => {
 		const guildMember = Builder(defaultGuildMember).build();
-		jest.spyOn(SpamFilter, 'onAllowlist').mockReturnValue(Promise.resolve(true));
+		jest.spyOn(UsernameSpamFilter, 'memberOnAllowlist').mockReturnValue(Promise.resolve(true));
 
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
+		expect(guildMember.guild.fetch).toHaveBeenCalledTimes(0);
+		expect(guildMember.ban).toHaveBeenCalledTimes(0);
+		expect(guildMember.send).toHaveBeenCalledTimes(0);
+	});
+
+	it('should skip filter for member that has role on allowlist', async () => {
+		const guildMember = Builder(defaultGuildMember).build();
+		jest.spyOn(UsernameSpamFilter, 'roleOnAllowlist').mockReturnValue(Promise.resolve(true));
+
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
 		expect(guildMember.guild.fetch).toHaveBeenCalledTimes(0);
 		expect(guildMember.ban).toHaveBeenCalledTimes(0);
 		expect(guildMember.send).toHaveBeenCalledTimes(0);
 	});
 
 	it('should not ban user with no matching nickname', async () => {
-		const guildMember = Builder(defaultGuildMember).build();
+		const guildMember = Builder(defaultGuildMember)
+			.nickname('Pioneer')
+			.displayName('Pioneer')
+			.user(Builder(defaultGuildMember.user)
+				.username('Pioneer')
+				.tag('Pioneer#1559')
+				.build())
+			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
 		expect(guildMember.ban).toHaveBeenCalledTimes(0);
 		expect(guildMember.send).toHaveBeenCalledTimes(0);
 	});
 
 	it('should not ban user with no matching username', async () => {
 		const guildMember = Builder(defaultGuildMember)
-			.nickname(null)
+			.nickname('Pioneer')
+			.displayName('Pioneer')
+			.user(Builder(defaultGuildMember.user)
+				.username('Pioneer')
+				.tag('Pioneer#1559')
+				.build())
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
 		expect(guildMember.ban).toHaveBeenCalledTimes(0);
 		expect(guildMember.send).toHaveBeenCalledTimes(0);
 	});
@@ -152,20 +164,23 @@ describe('Username spam filter', () => {
 		const guildMember = Builder(defaultGuildMember)
 			.nickname('0xLucas2')
 			.displayName('0xLucas2')
+			.user(Builder(defaultGuildMember.user)
+				.username('0xLucas2')
+				.tag('0xLucas2#1559')
+				.build())
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(false);
 		expect(guildMember.ban).toHaveBeenCalledTimes(0);
 		expect(guildMember.send).toHaveBeenCalledTimes(0);
 	});
 
 	it('should ban user when message fails to send', async () => {
 		const guildMember = Builder(defaultGuildMember)
-			.nickname('0xLucas')
 			.send(jest.fn(() => Promise.reject('DiscordAPIError Code 50007: Cannot send messages to this user.')) as any)
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});
@@ -174,21 +189,24 @@ describe('Username spam filter', () => {
 		const guildMember = Builder(defaultGuildMember)
 			.nickname('0xLucas')
 			.displayName('0xLucas')
+			.user(Builder(defaultGuildMember.user)
+				.username('Imposter')
+				.tag('Imposter#1559')
+				.build())
 			.build();
     
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});
 
 	it('should ban user with matching username', async () => {
 		const guildMember = Builder(defaultGuildMember)
-			.user(Builder(defaultGuildMember.user)
-				.username('0xLucas')
-				.build())
+			.nickname('Imposter')
+			.displayName('Imposter')
 			.build();
 
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});
@@ -199,7 +217,7 @@ describe('Username spam filter', () => {
 			.displayName('0xlucas')
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});
@@ -209,7 +227,7 @@ describe('Username spam filter', () => {
 			.nickname('0xLucàs')
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});
@@ -219,7 +237,7 @@ describe('Username spam filter', () => {
 			.nickname('0xLucas🏴')
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});
@@ -229,7 +247,7 @@ describe('Username spam filter', () => {
 			.nickname('AboveAverageJoe')
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});
@@ -240,7 +258,7 @@ describe('Username spam filter', () => {
 			.nickname('Αbove Average Joe')
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});
@@ -251,7 +269,7 @@ describe('Username spam filter', () => {
 			.nickname('Аbove Average Joe')
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});
@@ -261,7 +279,7 @@ describe('Username spam filter', () => {
 			.nickname('ﬀﬀbanks')
 			.build();
         
-		expect(await SpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
+		expect(await UsernameSpamFilter.runUsernameSpamFilter(guildMember)).toBe(true);
 		expect(guildMember.ban).toHaveBeenCalledTimes(1);
 		expect(guildMember.send).toHaveBeenCalledTimes(1);
 	});

@@ -2,7 +2,8 @@ import { Collection, GuildMember, Message, MessageEmbedOptions, MessageReaction,
 import { Db, Collection as MongoCollection, InsertWriteOpResult, BulkWriteError, MongoError } from 'mongodb';
 import { CommandContext } from 'slash-create';
 import ValidationError from '../../errors/ValidationError';
-import { UsernameSpamFilter } from '../../types/spam-filter/UsernameSpamFilter';
+import { UsernameSpamFilterConfig } from '../../types/spam-filter/UsernameSpamFilter';
+import { UsernameSpamFilterType } from '../../types/spam-filter/UsernameSpamFilterType';
 import dbUtils from '../../utils/dbUtils';
 import Log, { LogUtils } from '../../utils/Log';
 import ServiceUtils from '../../utils/ServiceUtils';
@@ -105,12 +106,12 @@ export const askForGrantOrRemoval = async (
 
 export const addRolesToUsernameSpamFilter = async (guildMember: GuildMember, dbInstance: Db, roles: Role[]): Promise<any> => {
     
-	const usernameSpamFilterAdminDb: MongoCollection = dbInstance.collection(constants.DB_COLLECTION_USERNAME_SPAM_FILTER);
+	const usernameSpamFilterDb: MongoCollection = dbInstance.collection(constants.DB_COLLECTION_USERNAME_SPAM_FILTER);
     
 	const usernameSpamFilterList = [];
 	for (const role of roles) {
 		usernameSpamFilterList.push({
-			objectType: 'ROLE',
+			objectType: UsernameSpamFilterType.HIGH_RANKING_ROLE,
 			discordObjectId: role.id,
 			discordObjectName: role.name,
 			discordServerId: guildMember.guild.id,
@@ -118,9 +119,9 @@ export const addRolesToUsernameSpamFilter = async (guildMember: GuildMember, dbI
 		});
 	}
 
-	let result: InsertWriteOpResult<UsernameSpamFilter>;
+	let result: InsertWriteOpResult<UsernameSpamFilterConfig>;
 	try {
-		result = await usernameSpamFilterAdminDb.insertMany(usernameSpamFilterList, {
+		result = await usernameSpamFilterDb.insertMany(usernameSpamFilterList, {
 			ordered: false,
 		});
 	} catch (e) {
@@ -137,11 +138,13 @@ export const addRolesToUsernameSpamFilter = async (guildMember: GuildMember, dbI
 };
 
 export const removeRolesFromUsernameSpamFilter = async (guildMember: GuildMember, db: Db, roles: Role[]): Promise<any> => {
-	const usernameSpamFilterAdminDb: MongoCollection = db.collection(constants.DB_COLLECTION_USERNAME_SPAM_FILTER);
+
+	const usernameSpamFilterDb: MongoCollection = db.collection(constants.DB_COLLECTION_USERNAME_SPAM_FILTER);
+
 	try {
 		for (const role of roles) {
-			await usernameSpamFilterAdminDb.deleteOne({
-				objectType: 'ROLE',
+			await usernameSpamFilterDb.deleteOne({
+				objectType: UsernameSpamFilterType.HIGH_RANKING_ROLE,
 				discordObjectId: role.id,
 				discordServerId: guildMember.guild.id,
 			});

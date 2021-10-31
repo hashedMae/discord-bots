@@ -1,7 +1,7 @@
 import { CommandContext, CommandOptionType, SlashCommand, SlashCreator } from 'slash-create';
 import EarlyTermination from '../../errors/EarlyTermination';
 import ValidationError from '../../errors/ValidationError';
-import ConfigSpamFilter from '../../service/spam-filter/ConfigSpamFilter';
+import ConfigSpamFilter from '../../service/spam-filter/ConfigUsernameSpamFilter';
 import { LogUtils } from '../../utils/Log';
 import ServiceUtils from '../../utils/ServiceUtils';
 
@@ -11,7 +11,6 @@ export default class SpamFilter extends SlashCommand {
 		super(creator, {
 			name: 'spam-filter',
 			description: 'Configure username spam filter',
-			guildIDs: ['851552281249972254'],
 			options: [
 				{
 					name: 'config',
@@ -72,5 +71,4 @@ export default class SpamFilter extends SlashCommand {
 			}
 		});
 	}
-	
 }

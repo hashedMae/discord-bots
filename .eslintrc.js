@@ -30,7 +30,7 @@ module.exports = {
 		'no-inline-comments': 'error',
 		'no-multi-spaces': 'error',
 		'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 1, maxBOF: 0 }],
-		'no-shadow': ['error', { allow: ['err', 'resolve', 'reject'] }],
+		"no-shadow": "off",
 		'no-trailing-spaces': ['error', { 'skipBlankLines': true, 'ignoreComments': true }],
 		'no-var': 'error',
 		'object-curly-spacing': ['error', 'always'],
@@ -56,6 +56,7 @@ module.exports = {
 		'@typescript-eslint/indent': 0,
 		'@typescript-eslint/member-delimiter-style': 0,
 		'@typescript-eslint/no-explicit-any': 0,
+		"@typescript-eslint/no-shadow": ["error"],
 		'@typescript-eslint/no-use-before-define': 0,
 		'@typescript-eslint/no-unused-vars': [
 			2,
