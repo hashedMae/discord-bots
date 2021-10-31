@@ -1,26 +1,26 @@
-import { Collection, GuildMember, Message, MessageEmbedOptions, MessageReaction, Role, Snowflake } from "discord.js";
-import { Db, Collection as MongoCollection, InsertWriteOpResult, BulkWriteError, MongoError } from "mongodb";
-import { CommandContext } from "slash-create";
-import ValidationError from "../../errors/ValidationError";
-import { UsernameSpamFilter } from "../../types/spam-filter/UsernameSpamFilter";
-import dbUtils from "../../utils/dbUtils";
-import Log, { LogUtils } from "../../utils/Log";
-import ServiceUtils from "../../utils/ServiceUtils";
-import constants from "../constants/constants";
-import { retrieveRoles } from "../poap/ConfigPOAP"; //TODO: move this to ServiceUtils
+import { Collection, GuildMember, Message, MessageEmbedOptions, MessageReaction, Role, Snowflake } from 'discord.js';
+import { Db, Collection as MongoCollection, InsertWriteOpResult, BulkWriteError, MongoError } from 'mongodb';
+import { CommandContext } from 'slash-create';
+import ValidationError from '../../errors/ValidationError';
+import { UsernameSpamFilter } from '../../types/spam-filter/UsernameSpamFilter';
+import dbUtils from '../../utils/dbUtils';
+import Log, { LogUtils } from '../../utils/Log';
+import ServiceUtils from '../../utils/ServiceUtils';
+import constants from '../constants/constants';
+import { retrieveRoles } from '../poap/ConfigPOAP';
 
 export default async (ctx: CommandContext, guildMember: GuildMember, roles?: string[]) : Promise<any> => {
-    if (!(ServiceUtils.isDiscordAdmin(guildMember) || ServiceUtils.isDiscordServerManager(guildMember))) {
+	if (!(ServiceUtils.isDiscordAdmin(guildMember) || ServiceUtils.isDiscordServerManager(guildMember))) {
 		throw new ValidationError('Sorry, only discord admins and managers can configure spam filter settings.');
 	}
 
-    const highRankingRoles: Role[] = await retrieveRoles(guildMember, roles);
+	const highRankingRoles: Role[] = await retrieveRoles(guildMember, roles);
 
-    if (highRankingRoles.length == 0) {
+	if (highRankingRoles.length == 0) {
 		throw new ValidationError('Please try again with at least 1 role.');
 	}
 
-    const intro: MessageEmbedOptions = {
+	const intro: MessageEmbedOptions = {
 		title: 'Username Spam Filter Configuration',
 		description: 'Welcome to Username Spam Filter configuration.\n\n' +
 			'This is used as a first-time setup of the username spam filter. I can help assign or remove high-ranking ' +
@@ -32,9 +32,9 @@ export default async (ctx: CommandContext, guildMember: GuildMember, roles?: str
 		},
 	};
 
-    const isAdd: boolean = await askForGrantOrRemoval(ctx, guildMember, highRankingRoles, intro);
+	const isAdd: boolean = await askForGrantOrRemoval(ctx, guildMember, highRankingRoles, intro);
 	const dbInstance: Db = await dbUtils.dbConnect(constants.DB_NAME_DEGEN);
-    let confirmationMsg: MessageEmbedOptions;
+	let confirmationMsg: MessageEmbedOptions;
 	if (isAdd) {
 		await addRolesToUsernameSpamFilter(guildMember, dbInstance, highRankingRoles);
 		confirmationMsg = {
@@ -49,9 +49,9 @@ export default async (ctx: CommandContext, guildMember: GuildMember, roles?: str
 		};
 	}
 
-    await guildMember.send({ embeds: [confirmationMsg] });
+	await guildMember.send({ embeds: [confirmationMsg] });
 	return;
-}
+};
 
 export const askForGrantOrRemoval = async (
 	ctx: CommandContext, guildMember: GuildMember, highRankingRoles: Role[], intro?: MessageEmbedOptions): Promise<boolean> => {
@@ -105,10 +105,10 @@ export const askForGrantOrRemoval = async (
 
 export const addRolesToUsernameSpamFilter = async (guildMember: GuildMember, dbInstance: Db, roles: Role[]): Promise<any> => {
     
-    const usernameSpamFilterAdminDb: MongoCollection = dbInstance.collection(constants.DB_COLLECTION_USERNAME_SPAM_FILTER);
+	const usernameSpamFilterAdminDb: MongoCollection = dbInstance.collection(constants.DB_COLLECTION_USERNAME_SPAM_FILTER);
     
-    const usernameSpamFilterList = [];
-    for (const role of roles) {
+	const usernameSpamFilterList = [];
+	for (const role of roles) {
 		usernameSpamFilterList.push({
 			objectType: 'ROLE',
 			discordObjectId: role.id,
@@ -118,7 +118,7 @@ export const addRolesToUsernameSpamFilter = async (guildMember: GuildMember, dbI
 		});
 	}
 
-    let result: InsertWriteOpResult<UsernameSpamFilter>;
+	let result: InsertWriteOpResult<UsernameSpamFilter>;
 	try {
 		result = await usernameSpamFilterAdminDb.insertMany(usernameSpamFilterList, {
 			ordered: false,

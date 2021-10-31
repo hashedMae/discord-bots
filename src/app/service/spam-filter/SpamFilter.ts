@@ -1,9 +1,9 @@
-import { GuildMember } from "discord.js";
-import { Db } from "mongodb";
-import { Allowlist } from "../../types/discord/Allowlist";
-import { Confusables } from "../../utils/Confusables";
-import Log from "../../utils/Log";
-import ServiceUtils from "../../utils/ServiceUtils";
+import { GuildMember } from 'discord.js';
+import { Db } from 'mongodb';
+import { Allowlist } from '../../types/discord/Allowlist';
+import { Confusables } from '../../utils/Confusables';
+import Log from '../../utils/Log';
+import ServiceUtils from '../../utils/ServiceUtils';
 import dbInstance from '../../utils/dbUtils';
 import roleIDs from '../constants/roleIds';
 import constants from '../constants/constants';
@@ -13,7 +13,7 @@ const emojiRegex = /\p{So}/gu;
 const whitespaceRegex = /[\s]/g;
 
 const SpamFilter = {
-    /**
+	/**
 	 * Bans a guild member if they have a nickname or username similar to that of a high ranking member 
 	 * of the Discord. 
 	 * 

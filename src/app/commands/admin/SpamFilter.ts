@@ -1,9 +1,9 @@
-import { CommandContext, CommandOptionType, SlashCommand, SlashCreator } from "slash-create";
-import EarlyTermination from "../../errors/EarlyTermination";
-import ValidationError from "../../errors/ValidationError";
-import ConfigSpamFilter from "../../service/spam-filter/ConfigSpamFilter";
-import { LogUtils } from "../../utils/Log";
-import ServiceUtils from "../../utils/ServiceUtils";
+import { CommandContext, CommandOptionType, SlashCommand, SlashCreator } from 'slash-create';
+import EarlyTermination from '../../errors/EarlyTermination';
+import ValidationError from '../../errors/ValidationError';
+import ConfigSpamFilter from '../../service/spam-filter/ConfigSpamFilter';
+import { LogUtils } from '../../utils/Log';
+import ServiceUtils from '../../utils/ServiceUtils';
 
 
 export default class SpamFilter extends SlashCommand {
@@ -35,26 +35,26 @@ export default class SpamFilter extends SlashCommand {
 							type: CommandOptionType.ROLE,
 							description: 'Role with high-ranking members.',
 							required: false,
-						}
-					]
-				}
+						},
+					],
+				},
 			],
 			throttling: {
 				usages: 1,
 				duration: 1,
 			},
 			defaultPermission: true,
-		})
+		});
 	}
 
-	async run(ctx: CommandContext) {
+async run(ctx: CommandContext) {
 		LogUtils.logCommandStart(ctx);
-		if (ctx.user.bot || ctx.guildID == undefined) return 'Please try /spam-filter within discord channel.'; 
+		if (ctx.user.bot || ctx.guildID == undefined) return 'Please try /spam-filter within discord channel.';
 
 		const { guildMember } = await ServiceUtils.getGuildAndMember(ctx);
 
-		let highRankingRoles = [ctx.options.config['role-1'], ctx.options.config['role-2'], ctx.options.config['role-3']]
-		let command = ConfigSpamFilter(ctx, guildMember, highRankingRoles);
+		const highRankingRoles = [ctx.options.config['role-1'], ctx.options.config['role-2'], ctx.options.config['role-3']];
+		const command = ConfigSpamFilter(ctx, guildMember, highRankingRoles);
 		return this.handleCommandError(ctx, command);
 	}
 
