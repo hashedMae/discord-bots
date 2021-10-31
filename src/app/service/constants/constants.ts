@@ -9,6 +9,7 @@ export default Object.freeze({
 	DB_COLLECTION_SCOAP_SQUAD: 'scoapSquad',
 	DB_COLLECTION_POAP_ADMINS: 'poapAdmins',
 	DB_COLLECTION_ALLOWLIST: 'allowList',
+	DB_COLLECTION_USERNAME_SPAM_FILTER: 'usernameSpamFilter',
 	MONGODB_URI_PARTIAL: `${process.env.MONGODB_PREFIX}://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASS}@${process.env.MONGODB_CLUSTER}/`,
 	MONGODB_OPTIONS: '?retryWrites=true&w=majority',
 	

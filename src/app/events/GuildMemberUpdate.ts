@@ -6,6 +6,7 @@ import { DiscordEvent } from '../types/discord/DiscordEvent';
 import ServiceUtils from '../utils/ServiceUtils';
 import sendGuildWelcomeMessage from './welcomeMats/GuildMats';
 import Log, { LogUtils } from '../utils/Log';
+import SpamFilter from '../service/spam-filter/SpamFilter';
 
 export default class implements DiscordEvent {
 	name = 'guildMemberUpdate';
@@ -22,7 +23,7 @@ export default class implements DiscordEvent {
 
 			if (ServiceUtils.isBanklessDAO(oldMember.guild)) {
 				if (oldMember.nickname !== newMember.nickname) {
-					await ServiceUtils.runUsernameSpamFilter(newMember as GuildMember);
+					await SpamFilter.runUsernameSpamFilter(newMember as GuildMember);
 					return;
 				}
 
