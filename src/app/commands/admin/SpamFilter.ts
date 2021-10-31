@@ -47,7 +47,7 @@ export default class SpamFilter extends SlashCommand {
 		});
 	}
 
-async run(ctx: CommandContext) {
+	async run(ctx: CommandContext) {
 		LogUtils.logCommandStart(ctx);
 		if (ctx.user.bot || ctx.guildID == undefined) return 'Please try /spam-filter within discord channel.';
 
