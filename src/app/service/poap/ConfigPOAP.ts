@@ -20,8 +20,8 @@ export default async (ctx: CommandContext, guildMember: GuildMember, roles?: str
 	if (!(ServiceUtils.isDiscordAdmin(guildMember) || ServiceUtils.isDiscordServerManager(guildMember))) {
 		throw new ValidationError('Sorry, only discord admins and managers can configure poap settings.');
 	}
-	const authorizedRoles: Role[] = await retrieveRoles(guildMember, roles);
-	const authorizedUsers: GuildMember[] = await retrieveUsers(guildMember, users);
+	const authorizedRoles: Role[] = await ServiceUtils.retrieveRoles(guildMember.guild, roles);
+	const authorizedUsers: GuildMember[] = await ServiceUtils.retrieveUsers(guildMember.guild, users);
 
 	if (authorizedRoles.length == 0 && authorizedUsers.length == 0) {
 		throw new ValidationError('Please try again with at least 1 discord user or role.');
@@ -113,34 +113,6 @@ export const askForGrantOrRemoval = async (
 		throw new ValidationError('Please re-initiate poap configuration.');
 	}
 	throw new ValidationError('Please approve or deny access.');
-};
-
-export const retrieveRoles = async (guildMember: GuildMember, authorizedRoles: string[]): Promise<Role[]> => {
-	const roles: Role[] = [];
-	for (const authRole of authorizedRoles) {
-		if (authRole == null) continue;
-		try {
-			const roleManager: Role = await guildMember.guild.roles.fetch(authRole);
-			roles.push(roleManager);
-		} catch (e) {
-			LogUtils.logError('failed to retrieve role from user', e);
-		}
-	}
-	return roles;
-};
-
-export const retrieveUsers = async (guildMember: GuildMember, authorizedUsers: string[]): Promise<GuildMember[]> => {
-	const users: GuildMember[] = [];
-	for (const authUser of authorizedUsers) {
-		if (authUser == null) continue;
-		try {
-			const member: GuildMember = await guildMember.guild.members.fetch(authUser);
-			users.push(member);
-		} catch (e) {
-			LogUtils.logError('failed to retrieve role from user', e);
-		}
-	}
-	return users;
 };
 
 export const storePOAPAdmins = async (

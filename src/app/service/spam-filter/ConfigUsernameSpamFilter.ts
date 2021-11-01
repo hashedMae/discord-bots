@@ -8,14 +8,13 @@ import dbUtils from '../../utils/dbUtils';
 import Log, { LogUtils } from '../../utils/Log';
 import ServiceUtils from '../../utils/ServiceUtils';
 import constants from '../constants/constants';
-import { retrieveRoles } from '../poap/ConfigPOAP';
 
 export default async (ctx: CommandContext, guildMember: GuildMember, roles?: string[]) : Promise<any> => {
 	if (!(ServiceUtils.isDiscordAdmin(guildMember) || ServiceUtils.isDiscordServerManager(guildMember))) {
 		throw new ValidationError('Sorry, only discord admins and managers can configure spam filter settings.');
 	}
 
-	const highRankingRoles: Role[] = await retrieveRoles(guildMember, roles);
+	const highRankingRoles: Role[] = await ServiceUtils.retrieveRoles(guildMember.guild, roles);
 
 	if (highRankingRoles.length == 0) {
 		throw new ValidationError('Please try again with at least 1 role.');

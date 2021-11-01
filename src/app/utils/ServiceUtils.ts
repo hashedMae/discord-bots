@@ -19,6 +19,7 @@ import client from '../app';
 import ValidationError from '../errors/ValidationError';
 import roleIDs from '../service/constants/roleIds';
 import discordServerIds from '../service/constants/discordServerIds';
+import { LogUtils } from './Log';
 
 const ServiceUtils = {
 	async getGuildAndMember(ctx: CommandContext): Promise<{ guild: Guild, guildMember: GuildMember }> {
@@ -130,6 +131,7 @@ const ServiceUtils = {
 
 	/**
 	 * Returns the first message in DM channel from the user
+	 * 
 	 * @param dmChannel direct message channel
 	 * @param waitInMilli number of milliseconds the bot should wait for a reply
 	 */
@@ -140,6 +142,48 @@ const ServiceUtils = {
 			time: waitInMilli,
 			errors: ['time'],
 		})).first().content;
+	},
+
+	/**
+	 * Return role objects for Discord server from list of role IDs.
+	 * 
+	 * @param guild Discord server to get roles objects from
+	 * @param roleIds role IDs to get objects for
+	 * @returns role objects
+	 */
+	async retrieveRoles(guild: Guild, roleIds: string[]): Promise<Role[]> {
+		const roles: Role[] = [];
+		for (const roleId of roleIds) {
+			if (roleId == null) continue;
+			try {
+				const roleManager: Role = await guild.roles.fetch(roleId);
+				roles.push(roleManager);
+			} catch (e) {
+				LogUtils.logError('failed to retrieve role from user', e);
+			}
+		}
+		return roles;
+	},
+	
+	/**
+	 * Return guild member objects for Discord server from list of user IDs.
+	 * 
+	 * @param guild Discord server to get members objects from
+	 * @param userIds user IDs to get guild members for
+	 * @returns guild member objects
+	 */
+	async retrieveUsers(guild: Guild, userIds: string[]): Promise<GuildMember[]> {
+		const users: GuildMember[] = [];
+		for (const userId of userIds) {
+			if (userId == null) continue;
+			try {
+				const member: GuildMember = await guild.members.fetch(userId);
+				users.push(member);
+			} catch (e) {
+				LogUtils.logError('failed to retrieve role from user', e);
+			}
+		}
+		return users;
 	},
 };
 
