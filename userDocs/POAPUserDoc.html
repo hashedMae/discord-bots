@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <title>How to POAP with DEGEN</title>
+        <link href='./POAPUserDoc.CSS' rel='stylesheet'>
+    </head>
+    
+    
+    <body>
+        <div align="justify">
+        <h1>The POAP Distribution Commands and Workflow</h1>
+        <br>
+
+        <p>DEGEN distributes POAPs by watching to see who participates in a Discord Voice Channel for an event. This can be a standard voice channel or a stage for events like community calls.</p>
+        <p>POAPs still need to be created and distributed from the POAP website; DEGEN simply automates distribution of the  claim links.</p>
+        <br>
+
+        <h3> POAP Distribution is supported by donations! The 9 of us greatly appreciate any support you provide!! 0x735FF6F197B0dc18eBEE127DD918d2111Eaf8220</h3>
+        <br>
+        <h3>Important things to note:</h3>
+        <br>
+        <p>- Initial <c1>/poap config</c1> <strong>must</strong> be ran by a user with <c1>Administrator</c1> permissions enabled within the roles settings. </p>
+        <p>- Anyone interacting with DEGEN or wanting to receive a mint link <strong>must</strong> have DMs enabled for the server.</p>
+        <p>- It is best to have the <c1>links.txt</c1> file from POAP website on hand before starting your call, but not mandatory.</p>
+        <p>- Always download the <c1>.csv</c1> file that DEGEN will offer to you after <c1>/poap end</c1>.</p>
+        <p>- Attendees must be in the voice channel for a minimum of 5 minutes to be added to the <c1>.csv</c1> log and qualify for a POAP from DEGEN.</p>
+        <p>- If you don't respond <c1>Yes</c1> to distributing poaps within a few minutes it will time out and won't ask you for the <c1>links.txt</c1> file.</p>
+        <p>- If you aren't asked for the <c1>links.txt</c1> file, don't worry. Just run a <c1>/poap distribute</c1> command back in the discord text channel. Then you will upload the <c1>.csv</c1> you saved, immediately followed by the <c1>links.txt</c1> you received from POAP when you set up the event.</p>
+        <br>
+        <h2>DEGEN POAP Videos</h2>
+        <br>
+        <h3>Step 1 Invite DEGEN and Run Setup</h3>
+        
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/zuWUG3CmeYA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        
+        <br>
+
+        <h3>Step 2 Begin Call Monitoring</h3>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/3kdIKXdh010" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <br>
+        <h3>Step 3 End Call Monitoring</h3>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/MkHaGRnXN0A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <br>
+        <h3>Step 3b Use Distribute to Send Links Later</h3>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/DMdurmQgtmU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <br><br>
+        <h2>DEGEN Commands</h2>
+        <br>
+        <h3><c1>/poap config</c1></h3>
+        <p>Command for configuring which roles have access to POAP commands. Use this for assigning access to who can create POAP events on your server.</p>
+        <br>
+        <h3><c1>/poap schedule</c1></h3>
+        <p>(coming soon)</p>
+        <br>
+        <h3><c1>/poap start</c1></h3>
+        <p>Command for starting a POAP event. DEGEN will DM you and ask which voice channel the event is going to take place in. It will then monitor the channel and log any users that spend at least five minutes in the channel until you end the event.</p>
+        <!-- image go here -->
+        <br>
+        <h3><c1>/poap end</c1></h3>
+        <p>This will end the event, triggering DEGEN to stop logging users. DEGEN will DM you with the number of participants, the channel the event took place in, and a csv file containing the details on who participated. DEGEN will also ask you if you're ready to send out POAP links to participants.</p>
+        <p>If you have already prepared the POAP and created it on POAP.xyz, you can reply <c1>Yes</c1> and DEGEN will ask you to upload the POAP <c1>links.txt</c1> file that was emailed to you. DEGEN will then take the links from the <c1>links.txt</c1> file and DM them out to all the participants in the <c1>.csv</c1> file.</p>
+        <p>If the POAP is not yet ready for distribution, ou can reply <c1>No</c1> and use the <c1>/poap distribute</c1> command later. Just make sure to save the <c1>.csv</c1> file with the list of participants for use with the <c1>/poap distribute</c1> command later.</p>
+        <!-- image go here -->
+        <br>
+        <h3><c1>/poap distribute</c1></h3>
+        <p>This command is for distributing POAPs after an event has endend. DEGEN will DM you and ask for the <c1>.csv</c1> file you received earlier that contains the list of participants.</p>
+        <p>The <c1>.csv</c1> file will have the following columns:</p>
+        <img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/74f20cd0-327e-421c-9d8c-e865df9daf4d/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20211101%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20211101T211334Z&X-Amz-Expires=86400&X-Amz-Signature=f0b24363f0efe21f9596319f415d9407705cdf910af34245cc57df966fc6a31d&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22">
+        <p>It will then ask for the <c1>links.txt</c1> file that was emailed to ou when you created the POAP. Degen will then take the links from the <c1>links.txt</c1> file and DM them out to all the participants in the <c1>.csv</c1> file. </p>
+        <!-- image go here -->
+        <br>
+        <h3>Alternative uses:</h3>
+        <p>Using <c1>/poap distribute</c1>, you are able to upload a <c1>.csv</c1> file of selected users when a call doesn't happen in Discord. This would need to be a correctly formatted <c1>.csv</c1> file with the most important piece of data being the Discord <c1>UserID</c1>, not the username#xxxx, which can be found through the following methods:  </p>
+        <p align="center"><a href="https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-">https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-</a></p>
+        <p align="center"><a href="https://www.swipetips.com/how-to-find-your-discord-user-id/">https://www.swipetips.com/how-to-find-your-discord-user-id/</a></p>
+
+
+
+        </div>
+        </body>
+</html>
